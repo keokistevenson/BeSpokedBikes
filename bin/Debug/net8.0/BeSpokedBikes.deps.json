@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "BeSpokedBikes/1.0.0": {
+        "runtime": {
+          "BeSpokedBikes.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "BeSpokedBikes/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
