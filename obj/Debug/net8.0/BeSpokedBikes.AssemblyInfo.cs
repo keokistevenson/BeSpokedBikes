@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BeSpokedBikes")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a4dcf4c8f84c3510aa434797c91510fe5a2fd663")]
 [assembly: System.Reflection.AssemblyProductAttribute("BeSpokedBikes")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BeSpokedBikes")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
