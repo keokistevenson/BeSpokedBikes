@@ -1,4 +1,5 @@
 using BeSpokedBikes.Data;
+using BeSpokedBikes.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace BeSpokedBikes
@@ -14,6 +15,11 @@ namespace BeSpokedBikes
 
             builder.Services.AddDbContext<BeSpokedContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("BeSpokedBikesDB")));
+
+            builder.Services.AddScoped<ICommissionService, CommissionService>();
+
+            builder.Services.AddScoped<IPricingService, PricingService>();
+
 
             var app = builder.Build();
 

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BeSpokedBikes.Data;
 using BeSpokedBikes.Models;
@@ -25,6 +20,36 @@ namespace BeSpokedBikes.Controllers
             return View(await _context.Salespersons.ToListAsync());
         }
 
+        // GET: Salespersons/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: Salespersons/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,Address,Phone,StartDate,TerminationDate,Manager")] Salesperson salesperson)
+        {
+
+            // Check for duplicates (by first and last name)
+            if (await _context.Salespersons.AnyAsync(s => s.FirstName == salesperson.FirstName && s.LastName == salesperson.LastName))
+            {
+                ModelState.AddModelError("", "Duplicate salesperson cannot be entered.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                _context.Add(salesperson);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(salesperson);
+        }
+
         // GET: Salespersons/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -43,28 +68,6 @@ namespace BeSpokedBikes.Controllers
             return View(salesperson);
         }
 
-        // GET: Salespersons/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Salespersons/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,Address,Phone,StartDate,TerminationDate,Manager")] Salesperson salesperson)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(salesperson);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(salesperson);
-        }
-
         // GET: Salespersons/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -73,11 +76,12 @@ namespace BeSpokedBikes.Controllers
                 return NotFound();
             }
 
-            var salesperson = await _context.Salespersons.FindAsync(id);
+            Salesperson? salesperson = await _context.Salespersons.FindAsync(id);
             if (salesperson == null)
             {
                 return NotFound();
             }
+
             return View(salesperson);
         }
 
@@ -91,6 +95,11 @@ namespace BeSpokedBikes.Controllers
             if (id != salesperson.Id)
             {
                 return NotFound();
+            }
+
+            if (await _context.Salespersons.AnyAsync(s => s.Id != salesperson.Id && s.FirstName == salesperson.FirstName && s.LastName == salesperson.LastName))
+            {
+                ModelState.AddModelError("", "Duplicate salesperson cannot be entered.");
             }
 
             if (ModelState.IsValid)
@@ -146,7 +155,7 @@ namespace BeSpokedBikes.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index)); 
         }
 
         private bool SalespersonExists(int id)

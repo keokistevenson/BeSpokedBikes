@@ -22,25 +22,8 @@ namespace BeSpokedBikes.Controllers
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Products.ToListAsync());
-        }
-
-        // GET: Products/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return View(product);
+            List<Product> products = await _context.Products.ToListAsync();
+            return View(products);
         }
 
         // GET: Products/Create
@@ -56,12 +39,19 @@ namespace BeSpokedBikes.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Manufacturer,Style,PurchasePrice,SalePrice,QtyOnHand,CommissionPercentage")] Product product)
         {
+            // Prevent duplicate product entries (by Name and Manufacturer)
+            if (await _context.Products.AnyAsync(p => p.Name == product.Name && p.Manufacturer == product.Manufacturer))
+            {
+                ModelState.AddModelError("", "Duplicate product cannot be entered.");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             return View(product);
         }
 
@@ -73,11 +63,12 @@ namespace BeSpokedBikes.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products.FindAsync(id);
+            Product? product = await _context.Products.FindAsync(id);
             if (product == null)
             {
                 return NotFound();
             }
+
             return View(product);
         }
 
@@ -91,6 +82,11 @@ namespace BeSpokedBikes.Controllers
             if (id != product.Id)
             {
                 return NotFound();
+            }
+
+            if (await _context.Products.AnyAsync(p => p.Id != product.Id && p.Name == product.Name && p.Manufacturer == product.Manufacturer))
+            {
+                ModelState.AddModelError("", "Duplicate product cannot be entered.");
             }
 
             if (ModelState.IsValid)
@@ -113,6 +109,25 @@ namespace BeSpokedBikes.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            return View(product);
+        }
+
+        // GET: Products/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var product = await _context.Products
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
             return View(product);
         }
 

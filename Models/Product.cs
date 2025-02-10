@@ -27,5 +27,8 @@ namespace BeSpokedBikes.Models
         /// </summary>
         [Range(0, 1)]
         public decimal CommissionPercentage { get; set; }
+
+        public ICollection<Discount> Discounts { get; set; } = new List<Discount>();
+        public ICollection<Sale> Sales { get; set; } = new List<Sale>();
     }
 }

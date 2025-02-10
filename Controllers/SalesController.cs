@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BeSpokedBikes.Data;
@@ -22,8 +18,33 @@ namespace BeSpokedBikes.Controllers
         // GET: Sales
         public async Task<IActionResult> Index()
         {
-            var beSpokedContext = _context.Sales.Include(s => s.Customer).Include(s => s.Product).Include(s => s.Salesperson);
+            var beSpokedContext = _context.Sales
+                .Include(s => s.Customer)
+                .Include(s => s.Product).Include(s => s.Salesperson);
+
             return View(await beSpokedContext.ToListAsync());
+        }
+
+        // GET: Sales/Create
+        public IActionResult Create()
+        {
+            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "FirstName");
+            ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Name");
+            ViewData["SalespersonId"] = new SelectList(_context.Salespersons, "Id", "FirstName");
+            return View();
+        }
+
+        // POST: Sales/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Id,ProductId,SalespersonId,CustomerId,SalesDate")] Sale sale)
+        {
+
+            _context.Add(sale);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Sales/Details/5
@@ -47,33 +68,7 @@ namespace BeSpokedBikes.Controllers
             return View(sale);
         }
 
-        // GET: Sales/Create
-        public IActionResult Create()
-        {
-            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "FirstName");
-            ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Manufacturer");
-            ViewData["SalespersonId"] = new SelectList(_context.Salespersons, "Id", "FirstName");
-            return View();
-        }
 
-        // POST: Sales/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ProductId,SalespersonId,CustomerId,SalesDate")] Sale sale)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(sale);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "FirstName", sale.CustomerId);
-            ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Manufacturer", sale.ProductId);
-            ViewData["SalespersonId"] = new SelectList(_context.Salespersons, "Id", "FirstName", sale.SalespersonId);
-            return View(sale);
-        }
 
         // GET: Sales/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -89,7 +84,7 @@ namespace BeSpokedBikes.Controllers
                 return NotFound();
             }
             ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "FirstName", sale.CustomerId);
-            ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Manufacturer", sale.ProductId);
+            ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Name", sale.ProductId);
             ViewData["SalespersonId"] = new SelectList(_context.Salespersons, "Id", "FirstName", sale.SalespersonId);
             return View(sale);
         }
@@ -106,30 +101,23 @@ namespace BeSpokedBikes.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    _context.Update(sale);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!SaleExists(sale.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                _context.Update(sale);
+                await _context.SaveChangesAsync();
             }
-            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "FirstName", sale.CustomerId);
-            ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Manufacturer", sale.ProductId);
-            ViewData["SalespersonId"] = new SelectList(_context.Salespersons, "Id", "FirstName", sale.SalespersonId);
-            return View(sale);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!SaleExists(sale.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Sales/Delete/5

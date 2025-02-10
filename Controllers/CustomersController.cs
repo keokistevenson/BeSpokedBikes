@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BeSpokedBikes.Data;
 using BeSpokedBikes.Models;
@@ -22,25 +17,8 @@ namespace BeSpokedBikes.Controllers
         // GET: Customers
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Customers.ToListAsync());
-        }
-
-        // GET: Customers/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var customer = await _context.Customers
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (customer == null)
-            {
-                return NotFound();
-            }
-
-            return View(customer);
+            List<Customer> customers = await _context.Customers.ToListAsync();
+            return View(customers);
         }
 
         // GET: Customers/Create
@@ -65,6 +43,26 @@ namespace BeSpokedBikes.Controllers
             return View(customer);
         }
 
+        // GET: Customers/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var customer = await _context.Customers
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (customer == null)
+            {
+                return NotFound();
+            }
+
+            return View(customer);
+        }
+
+       
+
         // GET: Customers/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -73,7 +71,7 @@ namespace BeSpokedBikes.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customers.FindAsync(id);
+            Customer? customer = await _context.Customers.FindAsync(id);
             if (customer == null)
             {
                 return NotFound();

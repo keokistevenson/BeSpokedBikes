@@ -48,7 +48,7 @@ namespace BeSpokedBikes.Controllers
         // GET: Discounts/Create
         public IActionResult Create()
         {
-            ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Manufacturer");
+            ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Name");
             return View();
         }
 
@@ -59,14 +59,9 @@ namespace BeSpokedBikes.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,ProductId,BeginDate,EndDate,DiscountPercentage")] Discount discount)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(discount);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Manufacturer", discount.ProductId);
-            return View(discount);
+            _context.Add(discount);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Discounts/Edit/5
@@ -82,7 +77,7 @@ namespace BeSpokedBikes.Controllers
             {
                 return NotFound();
             }
-            ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Manufacturer", discount.ProductId);
+            ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Name", discount.ProductId);
             return View(discount);
         }
 
@@ -98,28 +93,24 @@ namespace BeSpokedBikes.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    _context.Update(discount);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!DiscountExists(discount.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                _context.Update(discount);
+                await _context.SaveChangesAsync();
             }
-            ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Manufacturer", discount.ProductId);
-            return View(discount);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!DiscountExists(discount.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
+
         }
 
         // GET: Discounts/Delete/5
